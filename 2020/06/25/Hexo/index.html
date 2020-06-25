@@ -27,10 +27,12 @@
 <meta property="og:site_name" content="BlizzWiz Learning Journal">
 <meta property="og:description" content="I tried to override color settings of hexo theme after editing source&#x2F;css&#x2F;_variables&#x2F;base.styl 123456789101112131415161718&#x2F;&#x2F; Colors&#x2F;&#x2F; colors for use across theme.&#x2F;&#x2F; -----------------------------------">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/BlizzWiz/blogpic/master/img/hexo-theme-2.png">
 <meta property="article:published_time" content="2020-06-25T04:42:25.431Z">
-<meta property="article:modified_time" content="2020-06-25T05:02:26.215Z">
+<meta property="article:modified_time" content="2020-06-25T06:24:44.616Z">
 <meta property="article:author" content="BlizzWiz">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/BlizzWiz/blogpic/master/img/hexo-theme-2.png">
 
 <link rel="canonical" href="http://yoursite.com/2020/06/25/Hexo/">
 
@@ -184,7 +186,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2020-06-25 12:42:25 / Modified: 13:02:26" itemprop="dateCreated datePublished" datetime="2020-06-25T12:42:25+08:00">2020-06-25</time>
+              <time title="Created: 2020-06-25 12:42:25 / Modified: 14:24:44" itemprop="dateCreated datePublished" datetime="2020-06-25T12:42:25+08:00">2020-06-25</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -213,11 +215,9 @@
       
         <p>I tried to override color settings of hexo theme after editing source/css/_variables/base.styl</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">// Colors</span><br><span class="line">// colors for use across theme.</span><br><span class="line">// --------------------------------------------------</span><br><span class="line">$whitesmoke   = #f5f5f5;</span><br><span class="line">$gainsboro    = #eee;</span><br><span class="line">$grey-lighter = #ddd;</span><br><span class="line">$grey-light   = #ccc;</span><br><span class="line">$grey         = #bbb;</span><br><span class="line">$grey-dark    = #999;</span><br><span class="line">$grey-dim     = #666;</span><br><span class="line">$black-light  = #00396e;</span><br><span class="line">$black-dim    = #00396e;</span><br><span class="line">$black-deep   = #00396e;</span><br><span class="line">$red          = #ff2a2a;</span><br><span class="line">$blue-bright  = #87daff;</span><br><span class="line">$blue         = #0684bd;</span><br><span class="line">$blue-deep    = #262a30;</span><br><span class="line">$orange       = #fc6423;</span><br></pre></td></tr></table></figure>
-
 <p>However it just couldn’t work out and the color theme of github page remained unchanged. After closer look of source/css/main.styl:</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// CSS Style Guide: http://codeguide.co/#css</span><br><span class="line">$scheme    = hexo-config('scheme') ? hexo-config('scheme') : 'Muse';</span><br><span class="line">$variables = base $scheme;</span><br></pre></td></tr></table></figure>
-
-<p>It was simply because the scheme of Hexo theme set to “Muse” instead of the one I used “Mist”. Remeber there are 4 color shcemes under hexo-theme-next.<br>After changing scheme to “Mist” everything back on track.</p>
+<p><img src="https://raw.githubusercontent.com/BlizzWiz/blogpic/master/img/hexo-theme-2.png" alt="4 schemes under hexo-theme-next"><br>It was simply because the scheme of Hexo theme set to “Muse” instead of the one I used “Mist”. Remeber there are 4 color shcemes under hexo-theme-next.<br>After changing scheme to “Mist”, everything was back on track.</p>
 
     </div>
 
@@ -236,7 +236,10 @@
     <a href="/2020/06/24/IBM_Capstone_Project/" rel="prev" title="Analysis of Opening Szechuan Restaurants in Toronto">
       <i class="fa fa-chevron-left"></i> Analysis of Opening Szechuan Restaurants in Toronto
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2020/06/25/Draw%20folium%20map%20of%20Toronto/" rel="next" title="Generating GeoJSON File for Toronto">
+      Generating GeoJSON File for Toronto <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -310,14 +313,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-count">9</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
   </nav>

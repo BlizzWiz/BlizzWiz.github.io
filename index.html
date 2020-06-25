@@ -155,6 +155,112 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/25/Draw%20folium%20map%20of%20Toronto/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/10215660?s=460&u=eb79532c2a14b87d518344c0fd882f48730aa5bf&v=4">
+      <meta itemprop="name" content="BlizzWiz">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="BlizzWiz Learning Journal">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/06/25/Draw%20folium%20map%20of%20Toronto/" class="post-title-link" itemprop="url">Generating GeoJSON File for Toronto</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-06-25 14:40:46 / Modified: 17:38:52" itemprop="dateCreated datePublished" datetime="2020-06-25T14:40:46+08:00">2020-06-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/front-end/" itemprop="url" rel="index"><span itemprop="name">front-end</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/front-end/JSON/" itemprop="url" rel="index"><span itemprop="name">JSON</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>In IBM Data Science Capstone Project, we have to import Neighbourhoods Postal Codes of Toronto in order to fetch information using Foursquare API. We can obtain geojson file of Toronto Open Data but the geojson file is actually divided by Neighbourhood division, not on its postal codes. We have to customize our geojson file, using shape file from Statistics Canada.</p>
+<h2 id="Table-of-contents"><a href="#Table-of-contents" class="headerlink" title="Table of contents"></a>Table of contents</h2><ul>
+<li><a href="#preparation">1. Preparation</a></li>
+<li><a href="#shapefile">2. Read Shapefile</a></li>
+<li><a href="#choropleth">3. Choropleth Map of Toronto (Bonus Part)</a></li>
+</ul>
+<h2 id="1-Preparation"><a href="#1-Preparation" class="headerlink" title="1. Preparation"></a>1. Preparation<a name="preparation"></a></h2><h3 id="1-1-Data-Sources"><a href="#1-1-Data-Sources" class="headerlink" title="1.1 Data Sources"></a>1.1 Data Sources</h3><ol>
+<li>List of Postal code of Toronto: This <a href="https://en.wikipedia.org/wiki/List_of_postal_codes_of_Canada:_M" target="_blank" rel="noopener">wikipedia page</a> is for obtain all the neighbourhoods, including postal code, borough in Toronto.</li>
+<li>Boundary file: You can download the shape file from <a href="https://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/bound-limit-2016-eng.cfm" target="_blank" rel="noopener">https://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/bound-limit-2016-eng.cfm</a>. Please note the 2016 Census - Boundary files portray the full extent of the geographic areas, including the coastal water area of Canada.</li>
+</ol>
+<p>Pay attention to select right shapefile:</p>
+<ul>
+<li>format: ArcGIS ® (.shp) file</li>
+<li>Geographic area or water feature: Forward Sortation Area</li>
+<li>Digital Boundary File<br><img src="https://raw.githubusercontent.com/BlizzWiz/blogpic/master/img/boundary_file.png" alt="Select the Right Boundary File"></li>
+</ul>
+<h3 id="1-2-Data-Cleaning"><a href="#1-2-Data-Cleaning" class="headerlink" title="1.2 Data Cleaning"></a>1.2 Data Cleaning</h3><p>Let us first import python packages.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># library to handle data in a vectorized manner</span><br><span class="line">import numpy as np </span><br><span class="line"></span><br><span class="line"># library for data analsysis</span><br><span class="line">import pandas as pd </span><br><span class="line"></span><br><span class="line"># library to handle JSON files</span><br><span class="line">import json </span><br><span class="line">import requests</span><br></pre></td></tr></table></figure>
+<p>Then let us try to clean data and have postal codes of Toronto FSAs.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Read wikipedia page</span></span><br><span class="line">postal_codes = pd.read_html(<span class="string">'https://en.wikipedia.org/wiki/List_of_postal_codes_of_Canada:_M'</span>,header=<span class="number">0</span>)[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># Clean dataframe, delete rows with 'Not assigned'</span></span><br><span class="line">postal_codes = postal_codes[~postal_codes.Borough.str.contains(<span class="string">"Not assigned"</span>) == <span class="literal">True</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># Reset index for dataframe</span></span><br><span class="line">postal_codes = postal_codes.reset_index(drop=<span class="literal">True</span>)</span><br><span class="line">postal_codes.head()</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-3-GIS-software"><a href="#1-3-GIS-software" class="headerlink" title="1.3 GIS software"></a>1.3 GIS software</h3><p>We will need GIS software to open shapefile (.shp). Fortunately Mac user could download the QGIS software from <a href="https://qgis.org/downloads/macos/qgis-macos-ltr.dmg" target="_blank" rel="noopener">here</a>.QGIS is A Free and Open Source Geographic Information System. You can create, edit, visualise, analyse and publish geospatial information on Windows, Mac, Linux, BSD and mobile devices.</p>
+<h2 id="2-Read-Shapefile"><a href="#2-Read-Shapefile" class="headerlink" title="2. Read Shapefile"></a>2. Read Shapefile<a name="shapefile"></a></h2><p>Now we have our valid postal codes list for analysis, shapefile of Canada as well as GIS software to read shapefile. Let’s try read shapefile of canada.<br><img src="https://raw.githubusercontent.com/BlizzWiz/blogpic/master/img/shape.png" alt="shapefile"></p>
+<h3 id="2-1-Add-Layer"><a href="#2-1-Add-Layer" class="headerlink" title="2.1 Add Layer"></a>2.1 Add Layer</h3><p>After open QGIS, first we have to open shapefile and add vector layer.<br><img src="https://raw.githubusercontent.com/BlizzWiz/blogpic/master/img/Screen%20Shot%202020-06-25%20at%203.27.41%20PM.png" alt="vector layer"><br><img src="https://raw.githubusercontent.com/BlizzWiz/blogpic/master/img/vector%20layer.png" alt="choose shapefile"><br>Then we could take a close look of our file.</p>
+<h3 id="2-2-Filter-Layer"><a href="#2-2-Filter-Layer" class="headerlink" title="2.2 Filter Layer"></a>2.2 Filter Layer</h3><p>We only need Toronto’s FSAs geojson so we have to filter our layer. Again, we select Layer - Filter or we could just simply use shortcut for filter: command + f  </p>
+<p>Ok. So on query builder there are three fields on the file: “CFSAUID” “PRUID” “PRNAME”. On the Values box we can press ‘all’ to observe each field.<br><img src="https://raw.githubusercontent.com/BlizzWiz/blogpic/master/img/Screen%20Shot%202020-06-25%20at%203.40.34%20PM.png" alt=""><br>Now we could filter our layer using postal codes of Toronto. Let us provide specific filter expression</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">"CFSAUID" IN (postal codes list)"</span><br></pre></td></tr></table></figure>
+<p>Let’s test the filter to see if it is working.<br><img src="https://raw.githubusercontent.com/BlizzWiz/blogpic/master/img/96%20rows.png" alt=""><br>96 rows. Looks good. </p>
+<h3 id="2-3-Generating-GeoJSON-File"><a href="#2-3-Generating-GeoJSON-File" class="headerlink" title="2.3 Generating GeoJSON File"></a>2.3 Generating GeoJSON File</h3><p>Now let us save this layer to GeoJSON format. Layer - Save as. Please set to format to WGS84 format since we will need folium package to create a map based on GeoJSON file.<br><img src="https://raw.githubusercontent.com/BlizzWiz/blogpic/master/img/Screen%20Shot%202020-06-25%20at%203.54.14%20PM.png" alt=""><br>Voila. Here is out geojson file of Toronto. Let us try to create population choropleth map of Toronto. Here I uploaded the GeoJSON to <a href="https://github.com/BlizzWiz/IBM_Capstone_Project/blob/master/toronto_m.geojson" target="_blank" rel="noopener">Github</a>. Feel free to download it.<br><img src="https://raw.githubusercontent.com/BlizzWiz/blogpic/master/img/toronto_geo.png" alt=""></p>
+<h2 id="3-Choropleth-Map-of-Toronto-Bonus-Part"><a href="#3-Choropleth-Map-of-Toronto-Bonus-Part" class="headerlink" title="3. Choropleth Map of Toronto (Bonus Part)"></a>3. Choropleth Map of Toronto (Bonus Part)<a name="choropleth"></a></h2><h3 id="3-1-Obtain-Population-information"><a href="#3-1-Obtain-Population-information" class="headerlink" title="3.1 Obtain Population information"></a>3.1 Obtain Population information</h3><p><a href="https://www12.statcan.gc.ca/census-recensement/2016/dp-pd/hlt-fst/pd-pl/comprehensive.cfm" target="_blank" rel="noopener">Statistics Canada</a> has provided the information based on FSAs. Let us first do some data cleaning.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># fetch url </span></span><br><span class="line">url_pop = <span class="string">'https://www12.statcan.gc.ca/census-recensement/2016/dp-pd/hlt-fst/pd-pl/Tables/CompFile.cfm?Lang=Eng&amp;T=1201&amp;OFT=FULLCSV'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># read into dataframe</span></span><br><span class="line">pop = pd.read_csv(url_pop)</span><br><span class="line"></span><br><span class="line"><span class="comment"># drop irrelevant columns and make sure we are looking at Ontario</span></span><br><span class="line">pop = pop[[<span class="string">'Geographic code'</span>,<span class="string">'Geographic name'</span>,<span class="string">'Province or territory'</span>,<span class="string">'Population, 2016'</span>]]</span><br><span class="line">pop=pop[(pop[<span class="string">'Province or territory'</span>]== <span class="string">"Ontario"</span>)]</span><br><span class="line"></span><br><span class="line"><span class="comment"># change population column type to float</span></span><br><span class="line">pop[<span class="string">'Population, 2016'</span>].astype(float)</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-Create-population-choropleth-map-of-Toronto"><a href="#3-2-Create-population-choropleth-map-of-Toronto" class="headerlink" title="3.2 Create population choropleth map of Toronto"></a>3.2 Create population choropleth map of Toronto</h3><p>Ok. We have our population data as well as geojson file. Let’s map it.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># map rendering library</span></span><br><span class="line"><span class="keyword">import</span> folium </span><br><span class="line"></span><br><span class="line"><span class="comment"># read geojson file</span></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'/toronto_m.geojson'</span>) <span class="keyword">as</span> data:</span><br><span class="line">    t_geo= json.load(data)</span><br><span class="line"></span><br><span class="line"><span class="comment"># create choropleth map</span></span><br><span class="line">a = folium.Map(location=[<span class="number">43.6534817</span>, <span class="number">-79.3839347</span>], tiles=<span class="string">'cartodbpositron'</span>, zoom_start=<span class="number">11</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Add choropleth to the map, set as </span></span><br><span class="line">a.choropleth(</span><br><span class="line">    geo_data= t_geo,data= pop,</span><br><span class="line">    columns=[<span class="string">'Geographic code'</span>,<span class="string">'Population, 2016'</span>],</span><br><span class="line">    key_on=<span class="string">'feature.properties.CFSAUID'</span>,</span><br><span class="line">    fill_color=<span class="string">'Blues'</span>,</span><br><span class="line">    fill_opacity=<span class="number">0.9</span>, </span><br><span class="line">    line_opacity=<span class="number">0.1</span>,</span><br><span class="line">    legend_name=<span class="string">'Population of Toronto by FSAs'</span>)</span><br><span class="line">a</span><br></pre></td></tr></table></figure>
+<p>Here is the map. Thank you for reading this.<br><img src="https://raw.githubusercontent.com/BlizzWiz/blogpic/master/img/map.png" alt="choropleth map"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/25/Hexo/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -180,7 +286,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2020-06-25 12:42:25 / Modified: 13:02:26" itemprop="dateCreated datePublished" datetime="2020-06-25T12:42:25+08:00">2020-06-25</time>
+              <time title="Created: 2020-06-25 12:42:25 / Modified: 14:24:44" itemprop="dateCreated datePublished" datetime="2020-06-25T12:42:25+08:00">2020-06-25</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -209,11 +315,9 @@
       
           <p>I tried to override color settings of hexo theme after editing source/css/_variables/base.styl</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">// Colors</span><br><span class="line">// colors for use across theme.</span><br><span class="line">// --------------------------------------------------</span><br><span class="line">$whitesmoke   = #f5f5f5;</span><br><span class="line">$gainsboro    = #eee;</span><br><span class="line">$grey-lighter = #ddd;</span><br><span class="line">$grey-light   = #ccc;</span><br><span class="line">$grey         = #bbb;</span><br><span class="line">$grey-dark    = #999;</span><br><span class="line">$grey-dim     = #666;</span><br><span class="line">$black-light  = #00396e;</span><br><span class="line">$black-dim    = #00396e;</span><br><span class="line">$black-deep   = #00396e;</span><br><span class="line">$red          = #ff2a2a;</span><br><span class="line">$blue-bright  = #87daff;</span><br><span class="line">$blue         = #0684bd;</span><br><span class="line">$blue-deep    = #262a30;</span><br><span class="line">$orange       = #fc6423;</span><br></pre></td></tr></table></figure>
-
 <p>However it just couldn’t work out and the color theme of github page remained unchanged. After closer look of source/css/main.styl:</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// CSS Style Guide: http://codeguide.co/#css</span><br><span class="line">$scheme    = hexo-config('scheme') ? hexo-config('scheme') : 'Muse';</span><br><span class="line">$variables = base $scheme;</span><br></pre></td></tr></table></figure>
-
-<p>It was simply because the scheme of Hexo theme set to “Muse” instead of the one I used “Mist”. Remeber there are 4 color shcemes under hexo-theme-next.<br>After changing scheme to “Mist” everything back on track.</p>
+<p><img src="https://raw.githubusercontent.com/BlizzWiz/blogpic/master/img/hexo-theme-2.png" alt="4 schemes under hexo-theme-next"><br>It was simply because the scheme of Hexo theme set to “Muse” instead of the one I used “Mist”. Remeber there are 4 color shcemes under hexo-theme-next.<br>After changing scheme to “Mist”, everything was back on track.</p>
 
       
     </div>
@@ -1059,14 +1163,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-count">9</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
   </nav>
